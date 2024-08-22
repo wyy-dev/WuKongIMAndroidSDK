@@ -37,6 +37,7 @@ public class WKVideoContent extends WKMediaMessageContent {
             jsonObject.put("second", second);
             jsonObject.put("url", url);
             jsonObject.put("localPath", localPath);
+            jsonObject.put("type", this.type);
         } catch (JSONException e) {
             e.printStackTrace();
         }

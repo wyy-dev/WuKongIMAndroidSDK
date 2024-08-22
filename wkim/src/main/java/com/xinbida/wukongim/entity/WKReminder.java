@@ -1,12 +1,13 @@
 package com.xinbida.wukongim.entity;
 
+import java.io.Serializable;
 import java.util.Map;
 
 /**
  * 2020-01-24 13:34
  * 提醒信息
  */
-public class WKReminder {
+public class WKReminder implements Serializable {
     public long reminderID;
     public String messageID;
     public String channelID;

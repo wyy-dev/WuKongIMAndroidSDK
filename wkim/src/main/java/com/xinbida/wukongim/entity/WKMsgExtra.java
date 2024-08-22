@@ -5,7 +5,9 @@ import android.os.Parcelable;
 
 import com.xinbida.wukongim.msgmodel.WKMessageContent;
 
-public class WKMsgExtra implements Parcelable {
+import java.io.Serializable;
+
+public class WKMsgExtra implements Parcelable, Serializable {
     public String messageID;
     public String channelID;
     public byte channelType;

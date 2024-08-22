@@ -5,13 +5,14 @@ import android.os.Parcelable;
 
 import com.xinbida.wukongim.utils.DateUtils;
 
+import java.io.Serializable;
 import java.util.HashMap;
 
 /**
  * 2019-11-09 18:05
  * 频道实体
  */
-public class WKChannel implements Parcelable {
+public class WKChannel implements Parcelable, Serializable {
     //自增ID
     public long id;
     //频道ID

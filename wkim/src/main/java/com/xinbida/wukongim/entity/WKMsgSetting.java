@@ -3,7 +3,9 @@ package com.xinbida.wukongim.entity;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-public class WKMsgSetting implements Parcelable {
+import java.io.Serializable;
+
+public class WKMsgSetting implements Parcelable, Serializable {
     // 消息是否回执
     public int receipt;
     // 是否开启top

@@ -3,11 +3,13 @@ package com.xinbida.wukongim.entity;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import java.io.Serializable;
+
 /**
  * 4/16/21 1:52 PM
  * 消息回应
  */
-public class WKMsgReaction implements Parcelable {
+public class WKMsgReaction implements Parcelable, Serializable {
     public String messageID;
     public String channelID;
     public byte channelType;

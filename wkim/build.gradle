@@ -3,24 +3,40 @@ plugins {
     id 'kotlin-android'
     id 'maven-publish'
 }
+group = "com.github.wyy-dev"
+version = "1.0.0"
 
 afterEvaluate {
     publishing {
         publications {
-            maven(MavenPublication) {
-                afterEvaluate { artifact(tasks.getByName("bundleReleaseAar")) }
-                groupId = 'com.xinbida.wukongim'
-                artifactId = 'WKIMLib_loca'
-                version = '1.0.7'
-            }
-        }
-        repositories {
-            maven {
-                url = uri('../repository')
+            // Creates a Maven publication called "release".
+            release(MavenPublication) {
+                from components.release
+                groupId = 'com.github.wyy-dev'
+                artifactId = 'wkim'
+                version = '1.0'
             }
         }
     }
 }
+
+//afterEvaluate {
+//    publishing {
+//        publications {
+//            maven(MavenPublication) {
+//                afterEvaluate { artifact(tasks.getByName("bundleReleaseAar")) }
+//                groupId = 'com.xinbida.wukongim'
+//                artifactId = 'WKIMLib_loca'
+//                version = '1.0.7'
+//            }
+//        }
+//        repositories {
+//            maven {
+//                url = uri('../repository')
+//            }
+//        }
+//    }
+//}
 
 android {
     compileSdk 33

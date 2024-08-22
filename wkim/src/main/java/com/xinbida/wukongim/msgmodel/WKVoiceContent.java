@@ -36,6 +36,7 @@ public class WKVoiceContent extends WKMediaMessageContent {
             jsonObject.put("url", url);
             if (waveform != null)
                 jsonObject.put("waveform", waveform);
+            jsonObject.put("type", this.type);
         } catch (JSONException e) {
             e.printStackTrace();
         }

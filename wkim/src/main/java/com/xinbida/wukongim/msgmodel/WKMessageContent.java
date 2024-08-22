@@ -7,13 +7,14 @@ import com.xinbida.wukongim.entity.WKMentionInfo;
 
 import org.json.JSONObject;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
  * 2019-11-10 15:14
  * 基础内容消息实体
  */
-public class WKMessageContent implements Parcelable {
+public class WKMessageContent implements Parcelable, Serializable {
     //内容
     public String content;
     //发送者id

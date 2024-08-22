@@ -36,6 +36,7 @@ public class WKImageContent extends WKMediaMessageContent {
             jsonObject.put("width", width);
             jsonObject.put("height", height);
             jsonObject.put("localPath", localPath);
+            jsonObject.put("type", this.type);
         } catch (JSONException e) {
             WKLoggerUtils.getInstance().e(TAG, "encodeMsg error");
         }

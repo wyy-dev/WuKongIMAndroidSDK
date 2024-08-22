@@ -3,13 +3,14 @@ package com.xinbida.wukongim.entity;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
  * 2020-10-22 13:28
  * 提醒对象
  */
-public class WKMentionInfo implements Parcelable {
+public class WKMentionInfo implements Parcelable, Serializable {
 
     public boolean isMentionMe;
     public List<String> uids;

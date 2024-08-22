@@ -12,6 +12,7 @@ import com.xinbida.wukongim.utils.DateUtils;
 
 import org.json.JSONObject;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 
@@ -19,7 +20,7 @@ import java.util.List;
  * 2019-11-09 14:33
  * 消息体 对应 #DBMsgColumns 中字段
  */
-public class WKMsg implements Parcelable {
+public class WKMsg implements Parcelable, Serializable {
 
     //服务器消息ID(全局唯一，无序)
     public String messageID;

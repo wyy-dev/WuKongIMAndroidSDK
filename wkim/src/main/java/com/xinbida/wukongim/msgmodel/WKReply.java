@@ -8,11 +8,13 @@ import com.xinbida.wukongim.manager.MsgManager;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.Serializable;
+
 /**
  * 2020-10-13 12:12
  * 消息回复
  */
-public class WKReply implements Parcelable {
+public class WKReply implements Parcelable, Serializable {
     public String root_mid;
     public String message_id;
     public long message_seq;

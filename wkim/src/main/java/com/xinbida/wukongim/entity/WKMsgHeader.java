@@ -3,7 +3,9 @@ package com.xinbida.wukongim.entity;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-public class WKMsgHeader implements Parcelable {
+import java.io.Serializable;
+
+public class WKMsgHeader implements Parcelable, Serializable {
     //是否持久化[是否保存在数据库]
     public boolean noPersist;
     //对方是否显示红点

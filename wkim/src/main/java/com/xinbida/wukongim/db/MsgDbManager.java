@@ -61,9 +61,24 @@ public class MsgDbManager {
     private int requestCount;
 //    private int more = 1;
 
-    public void queryOrSyncHistoryMessages(String channelId, byte channelType, long oldestOrderSeq, boolean contain, int pullMode, int limit, final IGetOrSyncHistoryMsgBack iGetOrSyncHistoryMsgBack) {
+    /**
+     * 查询本地历史消息
+     * @param channelId
+     * @param channelType
+     * @param oldestOrderSeq
+     * @param contain
+     * @param pullMode
+     * @param limit
+     * @param iGetOrSyncHistoryMsgBack
+     */
+    public void queryHistoryMessages(String channelId, byte channelType, long oldestOrderSeq, boolean contain, int pullMode, int limit, List<Integer> msgTypeList, final IGetOrSyncHistoryMsgBack iGetOrSyncHistoryMsgBack) {
+        List<WKMsg> list = queryMessages(channelId, channelType, oldestOrderSeq, contain, pullMode, limit, msgTypeList);
+        new Handler(Looper.getMainLooper()).post(() -> iGetOrSyncHistoryMsgBack.onResult(list));
+    }
+
+        public void queryOrSyncHistoryMessages(String channelId, byte channelType, long oldestOrderSeq, boolean contain, int pullMode, int limit, final IGetOrSyncHistoryMsgBack iGetOrSyncHistoryMsgBack) {
         //获取原始数据
-        List<WKMsg> list = queryMessages(channelId, channelType, oldestOrderSeq, contain, pullMode, limit);
+        List<WKMsg> list = queryMessages(channelId, channelType, oldestOrderSeq, contain, pullMode, limit, null);
 //        if (more == 0) {
 //            new Handler(Looper.getMainLooper()).post(() -> iGetOrSyncHistoryMsgBack.onResult(list));
 //            more = 1;
@@ -266,27 +281,49 @@ public class MsgDbManager {
         return num;
     }
 
-    private List<WKMsg> queryMessages(String channelId, byte channelType, long oldestOrderSeq, boolean contain, int pullMode, int limit) {
+    /**
+     * 消息类型集合转 Where sql 片段
+     * @param msgTypeList
+     * @return
+     */
+    private String toMsgTypeWhereSql(List<Integer> msgTypeList) {
+        if (msgTypeList == null || msgTypeList == null) {
+            return "";
+        }
+        Iterator<Integer> iterator = msgTypeList.iterator();
+        if (!iterator.hasNext()) return "";
+        StringBuffer buffer = new StringBuffer();
+        buffer.append(" AND ( " + message + ".type=" + iterator.next());
+        while (iterator.hasNext()) {
+            buffer.append(" OR ");
+            buffer.append(message + ".type=" + iterator.next());
+        }
+        buffer.append(" ) ");
+        return buffer.toString();
+    }
+
+    private List<WKMsg> queryMessages(String channelId, byte channelType, long oldestOrderSeq, boolean contain, int pullMode, int limit, List<Integer> msgTypeList) {
+        String msgTypeWhereSql = toMsgTypeWhereSql(msgTypeList);
         List<WKMsg> msgList = new ArrayList<>();
         String sql;
         Object[] args;
         if (oldestOrderSeq <= 0) {
-            sql = "SELECT * FROM (SELECT " + messageCols + "," + extraCols + " FROM " + message + " LEFT JOIN " + messageExtra + " on " + message + ".message_id=" + messageExtra + ".message_id WHERE " + message + ".channel_id=? and " + message + ".channel_type=? and " + message + ".type<>0 and " + message + ".type<>99) where is_deleted=0 and is_mutual_deleted=0 order by order_seq desc limit 0," + limit;
+            sql = "SELECT * FROM (SELECT " + messageCols + "," + extraCols + " FROM " + message + " LEFT JOIN " + messageExtra + " on " + message + ".message_id=" + messageExtra + ".message_id WHERE " + message + ".channel_id=? and " + message + ".channel_type=? and " + message + ".type<>0 and " + message + ".type<>99" + msgTypeWhereSql + ") where is_deleted=0 and is_mutual_deleted=0 order by order_seq desc limit 0," + limit;
             args = new Object[2];
             args[0] = channelId;
             args[1] = channelType;
         } else {
             if (pullMode == 0) {
                 if (contain) {
-                    sql = "SELECT * FROM (SELECT " + messageCols + "," + extraCols + " FROM " + message + " LEFT JOIN " + messageExtra + " on " + message + ".message_id=" + messageExtra + ".message_id WHERE " + message + ".channel_id=? and " + message + ".channel_type=? and " + message + ".type<>0 and " + message + ".type<>99 AND " + message + ".order_seq<=?) where is_deleted=0 and is_mutual_deleted=0 order by order_seq desc limit 0," + limit;
+                    sql = "SELECT * FROM (SELECT " + messageCols + "," + extraCols + " FROM " + message + " LEFT JOIN " + messageExtra + " on " + message + ".message_id=" + messageExtra + ".message_id WHERE " + message + ".channel_id=? and " + message + ".channel_type=? and " + message + ".type<>0 and " + message + ".type<>99" + msgTypeWhereSql + " AND " + message + ".order_seq<=?) where is_deleted=0 and is_mutual_deleted=0 order by order_seq desc limit 0," + limit;
                 } else {
-                    sql = "SELECT * FROM (SELECT " + messageCols + "," + extraCols + " FROM " + message + " LEFT JOIN " + messageExtra + " on " + message + ".message_id=" + messageExtra + ".message_id WHERE " + message + ".channel_id=? and " + message + ".channel_type=? and " + message + ".type<>0 and " + message + ".type<>99 AND " + message + ".order_seq<?) where is_deleted=0 and is_mutual_deleted=0 order by order_seq desc limit 0," + limit;
+                    sql = "SELECT * FROM (SELECT " + messageCols + "," + extraCols + " FROM " + message + " LEFT JOIN " + messageExtra + " on " + message + ".message_id=" + messageExtra + ".message_id WHERE " + message + ".channel_id=? and " + message + ".channel_type=? and " + message + ".type<>0 and " + message + ".type<>99" + msgTypeWhereSql + " AND " + message + ".order_seq<?) where is_deleted=0 and is_mutual_deleted=0 order by order_seq desc limit 0," + limit;
                 }
             } else {
                 if (contain) {
-                    sql = "SELECT * FROM (SELECT " + messageCols + "," + extraCols + " FROM " + message + " LEFT JOIN " + messageExtra + " on " + message + ".message_id=" + messageExtra + ".message_id WHERE " + message + ".channel_id=? and " + message + ".channel_type=? and " + message + ".type<>0 and " + message + ".type<>99 AND " + message + ".order_seq>=?) where is_deleted=0 and is_mutual_deleted=0 order by order_seq asc limit 0," + limit;
+                    sql = "SELECT * FROM (SELECT " + messageCols + "," + extraCols + " FROM " + message + " LEFT JOIN " + messageExtra + " on " + message + ".message_id=" + messageExtra + ".message_id WHERE " + message + ".channel_id=? and " + message + ".channel_type=? and " + message + ".type<>0 and " + message + ".type<>99" + msgTypeWhereSql + " AND " + message + ".order_seq>=?) where is_deleted=0 and is_mutual_deleted=0 order by order_seq asc limit 0," + limit;
                 } else {
-                    sql = "SELECT * FROM (SELECT " + messageCols + "," + extraCols + " FROM " + message + " LEFT JOIN " + messageExtra + " on " + message + ".message_id=" + messageExtra + ".message_id WHERE " + message + ".channel_id=? and " + message + ".channel_type=? and " + message + ".type<>0 and " + message + ".type<>99 AND " + message + ".order_seq>?) where is_deleted=0 and is_mutual_deleted=0 order by order_seq asc limit 0," + limit;
+                    sql = "SELECT * FROM (SELECT " + messageCols + "," + extraCols + " FROM " + message + " LEFT JOIN " + messageExtra + " on " + message + ".message_id=" + messageExtra + ".message_id WHERE " + message + ".channel_id=? and " + message + ".channel_type=? and " + message + ".type<>0 and " + message + ".type<>99" + msgTypeWhereSql + " AND " + message + ".order_seq>?) where is_deleted=0 and is_mutual_deleted=0 order by order_seq asc limit 0," + limit;
                 }
             }
             args = new Object[3];
