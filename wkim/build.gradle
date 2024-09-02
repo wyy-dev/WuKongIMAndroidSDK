@@ -15,6 +15,15 @@ afterEvaluate {
                 groupId = 'com.github.wyy-dev'
                 artifactId = 'wkim'
                 version = '1.0.1'
+                pom.withXml {
+                    def dependenciesNode = asNode().appendNode('dependencies')
+                    configurations.runtimeClasspath.allDependencies.each { dep ->
+                        def dependencyNode = dependenciesNode.appendNode('dependency')
+                        dependencyNode.appendNode('groupId', dep.group)
+                        dependencyNode.appendNode('artifactId', dep.name)
+                        dependencyNode.appendNode('version', dep.version)
+                    }
+                }
             }
         }
     }
